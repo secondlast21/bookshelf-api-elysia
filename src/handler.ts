@@ -44,7 +44,7 @@ export const getAllBookHandler = (query: BookSearch) => {
   return books
 }
 
-export const getDetailBookByIdHandler = (id: string, set: any) => {
+export const getDetailBookByIdHandler = (id: string, error: any) => {
   const book = books.filter((n) => n.id === id)[0]
 
   if (book !== undefined) {
@@ -56,27 +56,23 @@ export const getDetailBookByIdHandler = (id: string, set: any) => {
     }
   }
 
-  set.status = 404
-  return {
+  return error(404, {
     status: 'fail',
     message: 'Book not found',
-  }
+  })
 }
 
-export const addBookHandler = (body: BookInput, set: any) => {
+export const addBookHandler = (body: BookInput, error: any) => {
   const id = nanoid(16)
   let finished = 'False'
   const insertedAt = new Date().toISOString()
   const updatedAt = insertedAt
 
-  if (body.name === undefined || null || '') {
-    const response = {
+  if (!body.name) {
+    return error(400, {
       status: 'fail',
       message: 'Fail to add book. Fill up the name of the book',
-    }
-
-    set.status = 400
-    return response
+    })
   }
 
   if (Number(body.pageCount) === Number(body.readPage)) {
@@ -84,13 +80,10 @@ export const addBookHandler = (body: BookInput, set: any) => {
   }
 
   if (Number(body.pageCount) < Number(body.readPage)) {
-    const response = {
+    return error(400, {
       status: 'fail',
       message: 'Fail to add book. readPage cannot be bigger than pageCount',
-    }
-
-    set.status = 400
-    return response
+    })
   }
 
   const newBook = {
@@ -123,25 +116,21 @@ export const addBookHandler = (body: BookInput, set: any) => {
     return response
   }
 
-  const response = {
+  return error(400, {
     status: 'error',
     message: 'Fail to add book',
-  }
-
-  set.status = 400
-  return response
+  })
 }
 
-export const editBookByIdHandler = (id: string, body: BookInput, set: any) => {
+export const editBookByIdHandler = (id: string, body: BookInput, error: any) => {
   let finished = 'False'
   const updatedAt = new Date().toISOString()
 
-  if (body.name === undefined || null || '') {
-    set.status = 400
-    return {
+  if (!body.name) {
+    return error(400, {
       status: 'fail',
       message: 'Fail to update book. Fill up the name of the book',
-    }
+    })
   }
 
   if (Number(body.pageCount) === Number(body.readPage)) {
@@ -149,11 +138,10 @@ export const editBookByIdHandler = (id: string, body: BookInput, set: any) => {
   }
 
   if (Number(body.pageCount) < Number(body.readPage)) {
-    set.status = 400
-    return {
-      status: 'fail',
-      message: 'Fail to update book. readPage cannot be bigger than pageCount',
-    }
+     return error(400, {
+       status: 'fail',
+       message: 'Fail to add book. readPage cannot be bigger than pageCount',
+     })
   }
 
   const idx = books.findIndex((book) => book.id === id)
@@ -174,31 +162,29 @@ export const editBookByIdHandler = (id: string, body: BookInput, set: any) => {
     }
     return {
       status: 'success',
-      message: 'Buku berhasil diperbarui',
+      message: 'Book updated',
     }
   }
 
-  set.status(404)
-  return {
-    status: 'fail',
-    message: 'Gagal memperbarui buku. Id tidak ditemukan',
-  }
+   return error(404, {
+     status: 'fail',
+     message: 'Fail to update book. Id not found',
+   })
 }
 
-export const deleteBookByIdHandler = (id: string, set: any) => {
+export const deleteBookByIdHandler = (id: string, error: any) => {
   const idx = books.findIndex((book) => book.id === id)
 
   if (idx >= 0) {
     books.splice(idx, 1)
     return {
       status: 'success',
-      message: 'Book delete',
+      message: 'Book deleted',
     }
   }
 
-  set.status = 404
-  return {
+  return error(404, {
     status: 'fail',
     message: 'Fail to delete book. Id not found',
-  }
+  })
 }

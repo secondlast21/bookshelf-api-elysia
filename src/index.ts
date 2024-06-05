@@ -26,12 +26,12 @@ app
           }
         ),
       })
-      .get('/:id', ({ params: { id }, set }) => getDetailBookByIdHandler(id, set))
-      .delete('/:id', ({ params: { id }, set }) => deleteBookByIdHandler(id, set))
+      .get('/:id', ({ params: { id }, error }) => getDetailBookByIdHandler(id, error))
+      .delete('/:id', ({ params: { id }, error }) => deleteBookByIdHandler(id, error))
       .post(
         '/',
-        async ({ body, set }) => {
-          const book = addBookHandler(body, set)
+        async ({ body, error }) => {
+          const book = addBookHandler(body, error)
           return book
         },
         {
@@ -47,7 +47,7 @@ app
           }),
         }
       )
-      .put('/:id', ({ params: { id }, body, set }) => editBookByIdHandler(id, body, set), {
+      .put('/:id', ({ params: { id }, body, error }) => editBookByIdHandler(id, body, error), {
         body: t.Object({
           name: t.String(),
           year: t.String(),
